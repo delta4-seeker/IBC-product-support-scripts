@@ -4,7 +4,7 @@ git
 foundry
 goloop
 
-how to run
+# docuent properly how to run command
 
 To deploy centralized-connection 
 make deploy-centralized env=mainnet chain=avalanche   

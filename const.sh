@@ -111,3 +111,7 @@ esac
 
 
 export ICON_COMMON_ARGS=" --uri $ICON_NODE --nid $ICON_NID --step_limit 4000000000 --key_store $ICON_WALLET --key_password $ICON_PASSWORD "
+export CONTRACT_ENV=$ROOT_DIR/env
+# mkdir -p $CONTRACT_ENV 
+# evm_env = contract_env/$evm_chainname...$env
+# icon_env

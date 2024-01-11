@@ -2,8 +2,11 @@ repo:
 	./const.sh
 	./ready.sh 
 
-deploy-centralized:
+deploy-centralized-evm:
 	./evm.sh ${env} ${chain}
+
+deploy-centralized-icon:
+	./icon.sh ${jarFile} ${addrLoc}
 
 centralized-fee:
 	./evm.sh ${env} ${chain} ${network} ${fee}
