@@ -11,7 +11,10 @@ pull-xcall-jar:
 
 deploy-centralized-icon:
 	./icon.sh
+# gollop rpc sendtx
+# use jq
 
+set-fee-icon:
 centralized-fee:
 	./evm.sh ${env} ${chain} ${network} ${fee}
 

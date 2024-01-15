@@ -28,12 +28,16 @@ function icon_wait_tx() {
     local tx_hash=$1
     [[ -z $tx_hash ]] && return
     # log "tx_hash : ${tx_hash}"
-    while :; do
-    echo "searching"
-        goloop rpc \
-            --uri "$ICON_NODE" \
-            txresult "$tx_hash" &>/dev/null && break || sleep 1
-    done
+    echo "Node is $ICON_NODE"
+    # while :; do
+
+    # echo "searching $tx_hash"
+    #     goloop rpc \
+    #         --uri "$ICON_NODE" \
+    #         txresult "$tx_hash" && break || sleep 2
+    # done
+    sleep 5 
+#goloop rpc  --uri "https://lisbon.net.solidwallet.io/api/v3/" txresult "0xc4c8a07d247bbf43e655bcd4b361d9702fac5be281f6d0687a989ce44db73c62"
     local txr=$(goloop rpc --uri "$ICON_NODE" txresult "$tx_hash" 2>/dev/null)
     local status=$(jq <<<"$txr" -r .status)
     # log "status : $status"
@@ -65,19 +69,20 @@ function deploy_contract() {
 
 	local params=()
     for i in "${@:3}"; do params+=("--param $i"); done
+
     local tx_hash=$(
         goloop rpc sendtx deploy $jarFile \
 	    	--content_type application/java \
 	    	--to cx0000000000000000000000000000000000000000 \
 	    	$ICON_COMMON_ARGS \
-            --param networkId=myNetwork \
+            --param networkId=myNetwork \ #try using above param
 	    	# ${params[@]} | jq -r .
     )
         echo "The transaction hash is $tx_hash" 
 
-   	# icon_wait_tx "$tx_hash" #bug here 
+   	icon_wait_tx "$tx_hash" #bug here 
 
-    save_address "$tx_hash" $addrLoc
+    save_address "$tx_hash" $addrLoc # save scoreAddress
 }
 
 deploy_contract
