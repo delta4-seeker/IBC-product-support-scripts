@@ -1,0 +1,8 @@
+mmake icon foler 
+make evm folder inside env 
+
+make centralise connaction file and put hte address there 
+make xcall file and put address 
+
+reference repo icon ibc , const.sh mai saved 
+

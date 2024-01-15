@@ -1,5 +1,5 @@
 #!/bin/bash
-
+source const.sh
 function log_stack() {
 	if [[ $PRINT_LOG_STACK == 1 ]];then
 	    local cmd=${FUNCNAME[1]}
@@ -17,7 +17,8 @@ function log_stack() {
 function requireFile() {
 	local errorMsg=$2
     if [ ! -f "$1" ]; then
-    	log $errorMsg
+    	# log $errorMsg
+        echo "FIle not found"
     fi
 }
 
@@ -26,15 +27,16 @@ function icon_wait_tx() {
     local ret=1
     local tx_hash=$1
     [[ -z $tx_hash ]] && return
-    log "tx_hash : ${tx_hash}"
+    # log "tx_hash : ${tx_hash}"
     while :; do
+    echo "searching"
         goloop rpc \
             --uri "$ICON_NODE" \
             txresult "$tx_hash" &>/dev/null && break || sleep 1
     done
     local txr=$(goloop rpc --uri "$ICON_NODE" txresult "$tx_hash" 2>/dev/null)
     local status=$(jq <<<"$txr" -r .status)
-    log "status : $status"
+    # log "status : $status"
     [[ "$status" == 0x0 ]] && echo $txr && exit 0
     [[ "$status" == 0x1 ]] && rset=0
     return $ret1
@@ -45,34 +47,37 @@ function save_address() {
     local ret=1
     local tx_hash=$1
     local addr_loc=$2
+    echo $tx_hash > $addr_loc 
+    # not working below
     [[ -z $tx_hash ]] && return
     local txr=$(goloop rpc --uri "$ICON_NODE" txresult "$tx_hash" 2>/dev/null)
     local score_address=$(jq <<<"$txr" -r .scoreAddress)
-    echo $score_address > $addr_loc
-    log "contract address : $score_address"
+    # echo $score_address > $addr_loc
+    # log "contract address : $score_address"
 }
 
 function deploy_contract() {
 	log_stack
-	local jarFile=$1
-    local addrLoc=$2
+	local jarFile="xcall-0.1.0-optimized.jar"
+    local addrLoc=$AADR_LOC
 	requireFile $jarFile "$jarFile does not exist"
-	log "deploying contract ${jarFile##*/} with params ${@:3}"
+	# log "deploying contract ${jarFile##*/} with params ${@:3}"
 
 	local params=()
     for i in "${@:3}"; do params+=("--param $i"); done
-
     local tx_hash=$(
         goloop rpc sendtx deploy $jarFile \
 	    	--content_type application/java \
 	    	--to cx0000000000000000000000000000000000000000 \
 	    	$ICON_COMMON_ARGS \
-	    	${params[@]} | jq -r .
+            --param networkId=myNetwork \
+	    	# ${params[@]} | jq -r .
     )
-   	icon_wait_tx "$tx_hash"
+        echo "The transaction hash is $tx_hash" 
+
+   	# icon_wait_tx "$tx_hash" #bug here 
+
     save_address "$tx_hash" $addrLoc
 }
 
-function deploy_centralized_connection() {
-    #
-}
+deploy_contract

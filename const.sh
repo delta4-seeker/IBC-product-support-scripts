@@ -6,11 +6,11 @@
 export EVM_CHAIN=avalanche
 export EVM_NET=mainnet
 
-export ICON_NET=mainnet # goloop, lisbon, berlin, mainnet
+export ICON_NET=lisbon # goloop, lisbon, berlin, mainnet
 
 
-export ICON_WALLET=$HOME/keystore/icon.json
-export ICON_PASSWORD=gochain
+export ICON_WALLET=$HOME/Desktop/centralized-relay/icon.json
+export ICON_PASSWORD=password
 
 # for evm
 export PRIVATE_KEY=
@@ -112,6 +112,16 @@ esac
 
 export ICON_COMMON_ARGS=" --uri $ICON_NODE --nid $ICON_NID --step_limit 4000000000 --key_store $ICON_WALLET --key_password $ICON_PASSWORD "
 export CONTRACT_ENV=$ROOT_DIR/env
-# mkdir -p $CONTRACT_ENV 
+
+mkdir -p $CONTRACT_ENV 
+cd env
+mkdir -p icon 
+mkdir -p evm 
+cd icon
+touch centralized_connection.txt
+cd ..
+cd ..
+export AADR_LOC="env/icon/centralized_connection.txt"
+
 # evm_env = contract_env/$evm_chainname...$env
 # icon_env
