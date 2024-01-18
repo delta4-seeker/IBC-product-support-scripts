@@ -6,3 +6,12 @@ make xcall file and put address
 
 reference repo icon ibc , const.sh mai saved 
 
+
+xcall - 
+setAdmin ()
+setProtocolFreeHandler
+setProtocolFee
+
+centralized connection 
+setAdmin 
+setFee

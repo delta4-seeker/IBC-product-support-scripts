@@ -1,5 +1,5 @@
 #!/bin/bash
-
+cd /
 git clone https://github.com/icon-project/xcall-multi
 cd xcall-multi
 cd contracts/evm
