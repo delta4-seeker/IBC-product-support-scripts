@@ -1,5 +1,6 @@
 #!/bin/bash
 source const.sh
+
 function log_stack() {
 	if [[ $PRINT_LOG_STACK == 1 ]];then
 	    local cmd=${FUNCNAME[1]}
@@ -52,7 +53,7 @@ function save_address() {
     [[ -z $tx_hash ]] && return
     local txr=$(goloop rpc --uri "$ICON_NODE" txresult "$tx_hash" 2>/dev/null)
     local score_address=$(jq <<<"$txr" -r .scoreAddress)
-    echo $score_address > $addr_loc
+    echo $score_address > $addr_loc 
     echo "Address saved!"
     # log "contract address : $score_address"
 }
@@ -60,12 +61,13 @@ function save_address() {
 function deploy_contract() {
 	log_stack
 	local jarFile=$1
-    local addrLoc=$AADR_LOC
+    local addrLoc=$2
+
 	requireFile $jarFile "$jarFile does not exist"
 	# log "deploying contract ${jarFile##*/} with params ${@:3}"
-    echo "params : $2"
 	local params=()
     for i in "${@:3}"; do params+=("--param $i"); done
+    echo "Deploying $jarFile with param ${params[@]} and saving address at $addrLoc"
     local tx_hash=$(
         goloop rpc sendtx deploy $jarFile \
 	    	--content_type application/java \
@@ -74,7 +76,26 @@ function deploy_contract() {
 	    	${params[@]} | jq -r .
     )
    	icon_wait_tx "$tx_hash" # wait until the contract is deployed
-    save_address "$tx_hash" $AADR_LOC # save scoreAddress
+    save_address "$tx_hash" $addrLoc # save scoreAddress
 }
-deploy_contract $1 "address_location_remaining" networkId=$2
+
+contract=$1
+parameter=$2
+
+case $contract in 
+    "centralized-connection")
+        jar_file=centralized-connection.jar
+        save_address=env/icon/icon_centralized_connection.txt
+        xcall_address=$(cat env/icon/icon_xcall.txt)
+        deploy_contract $jar_file $save_address _relayer=$parameter _xCall=$xcall_address
+        ;;
+    "xcall")
+
+        jar_file=xcall.jar
+        save_address=env/icon/icon_xcall.txt
+        deploy_contract $jar_file $save_address networkId=$parameter
+        ;;
+esac
+
+
 # deploy_contract "xcall-0.1.0-optimized.jar" "address_location_remaining" networkId=$1

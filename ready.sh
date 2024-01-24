@@ -1,5 +1,24 @@
 #!/bin/bash
-cd /
+source const.sh
+
+mkdir -p $CONTRACT_ENV
+cd env
+mkdir -p icon
+mkdir -p evm
+
+cd icon
+touch icon_centralized_connection.txt
+touch icon_xcall.txt
+cd ..
+
+
+cd evm
+touch evm_centralized_connection.txt
+touch evm_xcall.txt
+cd ..
+
+
+cd $ROOT_DIR
 git clone https://github.com/icon-project/xcall-multi
 cd xcall-multi
 cd contracts/evm

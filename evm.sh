@@ -1,12 +1,14 @@
 #!/bin/bash 
 # write contract address
-function deploy_evm_centralized() {
-    local env=$1
-    local chain=$2
+function deploy_evm() {
+    local contract=$1
+    local env=$2
+    local chain=$3
+    echo "deploying $contract on $chain $env"
     # cd $ROOT_DIR/xcall-multi/contracts/evm
     cd ~/Desktop/centralized-relay/xcall-multi/contracts/evm
     forge clean
-    ./deploy_script.sh --contract centralized --deploy --env $env --chain $chain
+    ./deploy_script.sh --contract $contract --deploy --env $env --chain $chain 
     cd $ROOT_DIR
 }
 
@@ -33,7 +35,8 @@ function deploy_evm_centralized() {
 
 # valid_testnet_chains=("sepolia" "bsc_testnet" "fuji" "arbitrum_goerli" "optimism_goerli" "base_goerli" "all")
 function deploy_at_testnet() {
-    local chain=$1
+    local contract=$1
+    local chain=$2
     case $chain in 
         "avalance")
             chain="fuji"
@@ -51,22 +54,21 @@ function deploy_at_testnet() {
             chain="base_goerli"
             ;;
     esac
-    deploy_evm_centralized testnet $chain
+    deploy_evm $contract testnet $chain
 
 }
 
 # valid_mainnet_chains=("ethereum" "binance" "avalanche" "arbitrum" "optimism" "base" "all")
-function deploy_at_mainnet() {
-    deploy_evm_centralized mainnet $1
-}
 
- env=$1
- chain_name=$2 
+contract=$1
+ env=$2
+ chain_name=$3 
+
 case $env in 
     "testnet") 
-        deploy_at_testnet $chain_name # 
+    deploy_at_testnet $contract $chain_name
         ;;
     "mainnet")
-        deploy_at_mainnet $chain_name
+    deploy_evm $contract mainnet $chain_name
         ;;
 esac
